@@ -5,8 +5,11 @@ import java.util.*;
  * @author linanqiu
  * @file_name KeywordRefiner.java
  * 
- * Runs through a random list of Keywords and 
+ *            Runs through a random list of Keywords and formats them. Input
+ *            must be keyword.txt that contains keywords separated by breaks.
+ *            For an example, look in the root directory of this repostiory.
  */
+
 public class KeywordRefiner {
 
 	public static final String FILENAME = "keyword.txt";
@@ -15,6 +18,15 @@ public class KeywordRefiner {
 	private static PrintWriter print;
 	private static ArrayList<String> processed;
 
+	/**
+	 * Runs through the list, replaces commas and other weird symbols, replacing
+	 * everything that are not alphanumeric and whitespaces, and deletes
+	 * duplicates. Finally, sorts them alphabetically. Useful for taking a list
+	 * of keywords for a certain subject and formatting them quickly.
+	 * 
+	 * @param args
+	 * @throws FileNotFoundException
+	 */
 	public static void main(String[] args) throws FileNotFoundException {
 		input = new File("keyword.txt");
 		output = new File("keyword_processed.txt");
