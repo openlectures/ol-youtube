@@ -23,6 +23,14 @@ import com.google.gdata.util.ServiceException;
 import com.google.gdata.util.ServiceForbiddenException;
 import com.google.gson.Gson;
 
+/**
+ * @author linanqiu
+ * @file_name PlaylistEditor.java
+ * 
+ *            Arranges YouTube videos into playlists based on Json input
+ *            collection of attribute=playlist, key=some_key,
+ *            value=playlist_value
+ */
 public class PlaylistEditor {
 
 	private String username;
@@ -36,6 +44,15 @@ public class PlaylistEditor {
 	private String playlistURL;
 	private PlaylistLinkFeed playlistLinkFeed;
 
+	/**
+	 * logs in and builds the playlistFeed URL
+	 * 
+	 * @param username
+	 * @param password
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 * @throws ServiceException
+	 */
 	public PlaylistEditor(String username, String password)
 			throws MalformedURLException, IOException, ServiceException {
 		this.username = username;
@@ -46,12 +63,29 @@ public class PlaylistEditor {
 		buildPlaylistURL();
 	}
 
+	/**
+	 * builds the playlist url from the default playlist URL by inserting the
+	 * username in
+	 */
 	private void buildPlaylistURL() {
 		playlistURL = "http://gdata.youtube.com/feeds/api/users/username/playlists";
 		playlistURL = playlistURL.replaceAll("username", this.username);
 		System.out.println(playlistURL);
 	}
 
+	/**
+	 * Commonly used method to delete all entries from a playlist. This is
+	 * rather contrived, because calling playlistEntry.delete() does not
+	 * necessarily delete the video because YouTube is fucked up. Hence this
+	 * method attempts to delete all PlaylistEntry s in the playlist first, then
+	 * counts the number of videos in the playlist, then repeats this process
+	 * again until the count size is zero.
+	 * 
+	 * @param playlist
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 * @throws ServiceException
+	 */
 	private void clearPlaylist(PlaylistLinkEntry playlist)
 			throws MalformedURLException, IOException, ServiceException {
 		PlaylistFeed playlistFeed = service.getFeed(
@@ -87,50 +121,70 @@ public class PlaylistEditor {
 			}
 			playlistFeed = service.getFeed(new URL(playlist.getFeedUrl()
 					+ "?max-results=50"), PlaylistFeed.class);
-			System.out.println(playlistFeed.getEntries().size());
 		}
 	}
 
-	public void deletePlaylists() throws MalformedURLException, IOException,
-			ServiceException {
-		playlistLinkFeed = service.getFeed(new URL(playlistURL
-				+ "?max-results=50"), PlaylistLinkFeed.class);
-
-		for (PlaylistLinkEntry playlist : playlistLinkFeed.getEntries()) {
-			if (playlist.getTitle().getPlainText().indexOf("Economics") > -1) {
-				playlist.delete();
-			} else {
-				System.out.println(playlist.getTitle().getPlainText());
-			}
-		}
-
-	}
-
+	/**
+	 * Scans all playlists, updating them as necessary. First, it corrects
+	 * existing playlists to make sure that it matches the website data. Then,
+	 * it adds all videos that does not belong in any existing playlist to new
+	 * playlists. The two private methods used should be quite self explanatory.
+	 * 
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 * @throws ServiceException
+	 */
 	public void scanPlaylists() throws MalformedURLException, IOException,
 			ServiceException {
 
 		playlistLinkFeed = service.getFeed(new URL(playlistURL),
 				PlaylistLinkFeed.class);
 
-		ArrayList<GsonCheckpoint> checkpointsWithoutPlaylist = new ArrayList<GsonCheckpoint>();
+		correctExistingPlaylists(playlistLinkFeed);
 
-		for (GsonCheckpoint checkpoint : gsonList) {
-			boolean found = false;
-			for (PlaylistLinkEntry playlist : playlistLinkFeed.getEntries()) {
+		addOtherCheckpoints(playlistLinkFeed);
+	}
 
-				if (playlist.getTitle().getPlainText()
-						.indexOf(checkpoint.getValue()) > -1) {
-					found = true;
-				}
-
-			}
-
-			if (!found) {
-				checkpointsWithoutPlaylist.add(checkpoint);
-			}
-		}
-
-		// Corrects Existing Playlists First
+	/**
+	 * Runs through all current playlist.
+	 * 
+	 * For each playlist that the account has,
+	 * 
+	 * 1. Doesn't touch Gary Lee's zArchive, [OL, or Misc lectures.
+	 * 
+	 * 2. Runs through the gsonList of checkpoints and find the checkpoints that
+	 * has the same playlist as the one currently being iterated. Adds them to
+	 * samePlaylistCheckpoints ArrayList.
+	 * 
+	 * 3. If the samePlaylistCheckpoints does not have the same size as the
+	 * playlist on YouTube,
+	 * 
+	 * 3a. If the samePlaylistCheckpoints ArrayList is empty, ie. there are
+	 * videos on YouTube but none on the website data list, something is wrong.
+	 * As a measure of safety, the playlist on YouTube is not deleted. Instead,
+	 * the error message
+	 * "PLAYLIST_TITLE  contains videos but website data has no checkpoints. Check?"
+	 * will be printed.
+	 * 
+	 * 3b. If samePlaylistCheckpoints is not empty, then delete every single
+	 * video in the playlist currently on YouTube. Then, readd all the
+	 * checkpoints in the samePlaylistCheckpoints ArrayList. In other words,
+	 * refreshing the playlist on YouTube.
+	 * 
+	 * 4. If the playlist on YouTube has the same size as sameCheckpointList,
+	 * then check for mismatches (ie. run through each video entry along hte
+	 * playlist on YouTube and the playlist in the sameCheckpointList and see if
+	 * they are the same key. If they are, then check is passed and there will
+	 * be no need to update the playlist on YouTube. If not, then delete all
+	 * videos in the playlist on YouTube and readd.
+	 * 
+	 * @param playlistLinkFeed
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 * @throws ServiceException
+	 */
+	private void correctExistingPlaylists(PlaylistLinkFeed playlistLinkFeed)
+			throws MalformedURLException, IOException, ServiceException {
 
 		for (PlaylistLinkEntry playlist : playlistLinkFeed.getEntries()) {
 
@@ -158,7 +212,8 @@ public class PlaylistEditor {
 
 					if (samePlaylistCheckpoints.size() == 0) {
 						System.out
-								.println("Playlist contains videos but website data has no checkpoints. Check?");
+								.println(playlist.getTitle().getPlainText()
+										+ " contains videos but website data has no checkpoints. Check?");
 					} else {
 
 						clearPlaylist(playlist);
@@ -219,9 +274,6 @@ public class PlaylistEditor {
 								+ " successfully updated");
 					}
 				} else {
-
-					System.out.println("Checkpoint number check passed for "
-							+ playlist.getTitle().getPlainText());
 
 					boolean mismatch = false;
 
@@ -294,20 +346,62 @@ public class PlaylistEditor {
 
 						System.out.println(playlist.getTitle().getPlainText()
 								+ " successfully updated");
+					} else {
+						System.out.println(playlist.getTitle().getPlainText()
+								+ " does not need updating.");
 					}
-
 				}
 			}
+		}
+	}
 
+	/**
+	 * Adds all other checkpoints to new playlists.
+	 * 
+	 * 1. Runs through all checkpoints in gsonList. For each checkpoint, runs
+	 * through all playlists to see if there's any match. If no match is found
+	 * after trying to match all playlists, add checkpoints to
+	 * checkpointsWithoutPlaylist.
+	 * 
+	 * 2. Go through checkpointsWithoutPlaylist, adds playlists for remaining
+	 * videos.
+	 * 
+	 * @param playlistLinkFeed
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 * @throws ServiceException
+	 */
+	private void addOtherCheckpoints(PlaylistLinkFeed playlistLinkFeed)
+			throws MalformedURLException, IOException, ServiceException {
+
+		ArrayList<GsonCheckpoint> checkpointsWithoutPlaylist = new ArrayList<GsonCheckpoint>();
+
+		for (GsonCheckpoint checkpoint : gsonList) {
+			boolean found = false;
+			for (PlaylistLinkEntry playlist : playlistLinkFeed.getEntries()) {
+
+				if (playlist.getTitle().getPlainText()
+						.indexOf(checkpoint.getValue()) > -1) {
+					found = true;
+				}
+
+			}
+			if (!found) {
+				checkpointsWithoutPlaylist.add(checkpoint);
+			}
 		}
 
-		// Then add remaining playlists without any existing playlist to match
-		// to
-
+		// if there are checkpoints left to add,
 		if (checkpointsWithoutPlaylist.size() > 0) {
+
+			// create a new tempPlaylist and add the first checkpoint in the
+			// checkpointsWithoutPlaylist
 			ArrayList<GsonCheckpoint> tempPlaylist = new ArrayList<GsonCheckpoint>();
 			tempPlaylist.add(checkpointsWithoutPlaylist.get(0));
 
+			// keep adding new checkpoints until a new playlist is reached. When
+			// that happens, add the contents of the tempPlaylist into a newly
+			// created playlist.
 			for (int i = 1; i < checkpointsWithoutPlaylist.size(); i++) {
 
 				if (checkpointsWithoutPlaylist
@@ -381,6 +475,7 @@ public class PlaylistEditor {
 					tempPlaylist.add(checkpointsWithoutPlaylist.get(i));
 				}
 
+				// account for the very last playlist
 				if (i == checkpointsWithoutPlaylist.size() - 1) {
 
 					PlaylistLinkEntry newEntry = new PlaylistLinkEntry();
@@ -450,6 +545,11 @@ public class PlaylistEditor {
 		}
 	}
 
+	/**
+	 * Takes in json
+	 * 
+	 * @param json
+	 */
 	public void setJson(String json) {
 		Gson gson = new Gson();
 		Type collectionType = new TypeToken<Collection<GsonCheckpoint>>() {
@@ -457,6 +557,12 @@ public class PlaylistEditor {
 		gsonList = gson.fromJson(json, collectionType);
 	}
 
+	/**
+	 * @author linanqiu
+	 * @file_name PlaylistEditor.java
+	 * 
+	 *            Subclass that represents a deserialized cehckpoint
+	 */
 	private class GsonCheckpoint {
 
 		private String attribute;
