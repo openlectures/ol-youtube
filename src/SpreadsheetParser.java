@@ -17,9 +17,9 @@ import com.google.gson.GsonBuilder;
  * @author linanqiu
  * @file_name SpreadsheetParser.java
  * 
- *            Parses the Website Data spreadsheet and produces various content
- *            in Json, the format being {"attribute":"some_attribute",
- *            "key":"some_youtube_key",
+ *            DEPRECATED Parses the Website Data spreadsheet and produces
+ *            various content in Json, the format being
+ *            {"attribute":"some_attribute", "key":"some_youtube_key",
  *            "value":"some_value_for_that_attribute"}. These values are then
  *            used by other classes.
  * 

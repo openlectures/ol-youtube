@@ -61,6 +61,8 @@ public class PlaylistEditor {
 		service = new YouTubeService(CLIENT_ID, DEVELOPER_KEY);
 		service.setUserCredentials(this.username, this.password);
 		buildPlaylistURL();
+
+		boolean success = false;
 	}
 
 	/**
