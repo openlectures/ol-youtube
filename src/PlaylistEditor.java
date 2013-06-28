@@ -43,6 +43,7 @@ public class PlaylistEditor {
 	private ArrayList<String> currentPlaylistTitles;
 	private String playlistURL;
 	private PlaylistLinkFeed playlistLinkFeed;
+	
 
 	/**
 	 * logs in and builds the playlistFeed URL
