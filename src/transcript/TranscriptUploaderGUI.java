@@ -1,4 +1,5 @@
 package transcript;
+
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -79,7 +80,6 @@ public class TranscriptUploaderGUI {
 	public TranscriptUploaderGUI() {
 		initialize();
 		redirectSystemStreams();
-
 	}
 
 	/**
@@ -98,6 +98,7 @@ public class TranscriptUploaderGUI {
 		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 1.0,
 				Double.MIN_VALUE };
 		frame.getContentPane().setLayout(gridBagLayout);
+		frame.setVisible(true);
 
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
@@ -385,6 +386,7 @@ public class TranscriptUploaderGUI {
 						txtTranscriptCount.setText(String
 								.valueOf(transcriptUploader
 										.parseTranscripts(folder)));
+
 						btnCheckTranscripts.setEnabled(true);
 
 					} catch (IOException e) {

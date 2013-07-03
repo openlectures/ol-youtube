@@ -1,4 +1,5 @@
 package transcript;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -114,8 +115,8 @@ public class TranscriptUploader {
 			throws MalformedURLException, IOException, ServiceException {
 		String playlistUrl = String.format(PLAYLIST_FEED_URL_FORMAT, "default");
 
-		PlaylistLinkFeed feed = service.getFeed(new URL(playlistUrl),
-				PlaylistLinkFeed.class);
+		PlaylistLinkFeed feed = service.getFeed(new URL(playlistUrl
+				+ "?max-results=50"), PlaylistLinkFeed.class);
 
 		List<PlaylistLinkEntry> playlistLinkEntries = feed.getEntries();
 
@@ -126,8 +127,8 @@ public class TranscriptUploader {
 			throws MalformedURLException, IOException, ServiceException {
 		String playlistUrl = chosenPlaylist.getFeedUrl();
 
-		PlaylistFeed playlistFeed = service.getFeed(new URL(playlistUrl),
-				PlaylistFeed.class);
+		PlaylistFeed playlistFeed = service.getFeed(new URL(playlistUrl
+				+ "?max-results=50"), PlaylistFeed.class);
 
 		videoIds.clear();
 
