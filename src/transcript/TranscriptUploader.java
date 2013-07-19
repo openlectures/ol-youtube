@@ -120,6 +120,9 @@ public class TranscriptUploader {
 
 		List<PlaylistLinkEntry> playlistLinkEntries = feed.getEntries();
 
+		Collections
+				.sort(playlistLinkEntries, new PlaylistLinkEntryComparator());
+
 		return playlistLinkEntries;
 	}
 
@@ -134,6 +137,17 @@ public class TranscriptUploader {
 
 		for (PlaylistEntry entry : playlistFeed.getEntries()) {
 			videoIds.add(entry.getMediaGroup().getVideoId());
+		}
+
+		int count = 1;
+		while (playlistFeed.getEntries().size() == 50) {
+			playlistFeed = service.getFeed(new URL(playlistUrl
+					+ "?max-results=50" + "&start-index=" + (count * 50 + 1)),
+					PlaylistFeed.class);
+			for (PlaylistEntry entry : playlistFeed.getEntries()) {
+				videoIds.add(entry.getMediaGroup().getVideoId());
+			}
+			count++;
 		}
 
 		return videoIds.size();
@@ -298,5 +312,17 @@ public class TranscriptUploader {
 
 			return s1Length - s2Length;
 		}
+	}
+
+	public class PlaylistLinkEntryComparator implements
+			Comparator<PlaylistLinkEntry> {
+
+		@Override
+		public int compare(PlaylistLinkEntry o1, PlaylistLinkEntry o2) {
+			int compareValue = o1.getTitle().getPlainText()
+					.compareToIgnoreCase(o2.getTitle().getPlainText());
+			return compareValue;
+		}
+
 	}
 }

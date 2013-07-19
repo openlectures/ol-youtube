@@ -20,24 +20,29 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.MouseInputListener;
 
 import com.google.gdata.data.youtube.PlaylistLinkEntry;
 import com.google.gdata.util.AuthenticationException;
 import com.google.gdata.util.ServiceException;
 
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.awt.Color;
+import javax.swing.SwingConstants;
 
 public class TranscriptUploaderGUI {
 
@@ -177,7 +182,9 @@ public class TranscriptUploaderGUI {
 		panel_1.setLayout(gbl_panel_1);
 
 		JLabel lblPlaylist = new JLabel("Playlist");
+		lblPlaylist.setHorizontalAlignment(SwingConstants.RIGHT);
 		GridBagConstraints gbc_lblPlaylist = new GridBagConstraints();
+		gbc_lblPlaylist.anchor = GridBagConstraints.EAST;
 		gbc_lblPlaylist.insets = new Insets(0, 0, 5, 5);
 		gbc_lblPlaylist.gridx = 0;
 		gbc_lblPlaylist.gridy = 0;
@@ -193,7 +200,9 @@ public class TranscriptUploaderGUI {
 		panel_1.add(comboBox, gbc_comboBox);
 
 		JLabel lblTranscripts = new JLabel("Transcripts");
+		lblTranscripts.setHorizontalAlignment(SwingConstants.RIGHT);
 		GridBagConstraints gbc_lblTranscripts = new GridBagConstraints();
+		gbc_lblTranscripts.anchor = GridBagConstraints.EAST;
 		gbc_lblTranscripts.gridheight = 2;
 		gbc_lblTranscripts.insets = new Insets(0, 0, 0, 5);
 		gbc_lblTranscripts.gridx = 0;
@@ -262,10 +271,12 @@ public class TranscriptUploaderGUI {
 		panel_2.add(scrollPane, gbc_scrollPane);
 
 		txtrConsole = new JTextArea();
+		txtrConsole.setLineWrap(true);
 		txtrConsole.setEditable(false);
 		txtrConsole.setWrapStyleWord(true);
 		txtrConsole.setText("Console");
 		scrollPane.setViewportView(txtrConsole);
+		txtrConsole.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
 
 		btnCheckTranscripts = new JButton("Check Transcripts");
 		GridBagConstraints gbc_btnCheckTranscripts = new GridBagConstraints();
@@ -296,6 +307,8 @@ public class TranscriptUploaderGUI {
 		btnSelectFiles.addActionListener(new FilesListener());
 		btnCheckTranscripts.addActionListener(new CheckListener());
 		btnUploadTranscripts.addActionListener(new UploadListener());
+		txtUsername.addMouseListener(new TextListener());
+		pwdPassword.addMouseListener(new TextListener());
 
 		comboBox.setEnabled(false);
 		btnSelectFolder.setEnabled(false);
@@ -317,6 +330,11 @@ public class TranscriptUploaderGUI {
 
 				playlistLinkEntries = transcriptUploader
 						.getPlaylistLinkEntries();
+
+				for (PlaylistLinkEntry a : playlistLinkEntries) {
+					System.out.println(a.getTitle().getPlainText());
+				}
+				comboBox.removeAllItems();
 
 				for (PlaylistLinkEntry entry : playlistLinkEntries) {
 					comboBox.addItem(entry.getTitle().getPlainText());
@@ -455,6 +473,54 @@ public class TranscriptUploaderGUI {
 				System.out
 						.println("Number of Transcripts not equal Number of Videos in Playlist. Cannot Upload.");
 			}
+
+		}
+	}
+
+	public class TextListener implements MouseInputListener {
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (e.getSource().equals(txtUsername)) {
+				txtUsername.setText("");
+			} else if (e.getSource().equals(pwdPassword)) {
+				pwdPassword.setText("");
+			}
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
+			// TODO Auto-generated method stub
 
 		}
 	}
