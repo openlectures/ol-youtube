@@ -1,34 +1,12 @@
 package transcript;
 
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import java.awt.GridBagLayout;
-import javax.swing.JPanel;
-import java.awt.GridBagConstraints;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JPasswordField;
-import java.awt.Insets;
-
-import javax.swing.BorderFactory;
-import javax.swing.JComboBox;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
-import javax.swing.border.EtchedBorder;
-import javax.swing.event.MouseInputListener;
-
-import com.google.gdata.data.youtube.PlaylistLinkEntry;
-import com.google.gdata.util.AuthenticationException;
-import com.google.gdata.util.ServiceException;
-
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.EventQueue;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -38,11 +16,30 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.awt.Color;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+import javax.swing.border.EtchedBorder;
+import javax.swing.event.MouseInputListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import com.google.gdata.data.youtube.PlaylistLinkEntry;
+import com.google.gdata.util.AuthenticationException;
+import com.google.gdata.util.ServiceException;
 
 public class TranscriptUploaderGUI {
 
@@ -55,7 +52,6 @@ public class TranscriptUploaderGUI {
 	private JTextArea txtrConsole;
 	private JButton btnCheckTranscripts;
 	private JButton btnUploadTranscripts;
-	private JButton btnSelectFolder;
 
 	private TranscriptUploader transcriptUploader;
 	private List<PlaylistLinkEntry> playlistLinkEntries;
@@ -209,14 +205,6 @@ public class TranscriptUploaderGUI {
 		gbc_lblTranscripts.gridy = 1;
 		panel_1.add(lblTranscripts, gbc_lblTranscripts);
 
-		btnSelectFolder = new JButton("Select Folder");
-		GridBagConstraints gbc_btnSelectFolder = new GridBagConstraints();
-		gbc_btnSelectFolder.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnSelectFolder.insets = new Insets(0, 0, 5, 0);
-		gbc_btnSelectFolder.gridx = 2;
-		gbc_btnSelectFolder.gridy = 1;
-		panel_1.add(btnSelectFolder, gbc_btnSelectFolder);
-
 		txtFolderPath = new JTextField();
 		txtFolderPath.setEditable(false);
 		txtFolderPath.setText("Folder Path");
@@ -228,6 +216,17 @@ public class TranscriptUploaderGUI {
 		panel_1.add(txtFolderPath, gbc_txtFolderPath);
 		txtFolderPath.setColumns(10);
 
+		btnSelectFiles = new JButton("Select Files");
+		GridBagConstraints gbc_btnSelectFiles = new GridBagConstraints();
+		gbc_btnSelectFiles.gridheight = 2;
+		gbc_btnSelectFiles.insets = new Insets(0, 0, 5, 0);
+		gbc_btnSelectFiles.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnSelectFiles.gridx = 2;
+		gbc_btnSelectFiles.gridy = 1;
+		panel_1.add(btnSelectFiles, gbc_btnSelectFiles);
+		btnSelectFiles.addActionListener(new FilesListener());
+		btnSelectFiles.setEnabled(false);
+
 		txtTranscriptCount = new JTextField();
 		txtTranscriptCount.setEditable(false);
 		txtTranscriptCount.setText("Transcript Count");
@@ -238,13 +237,6 @@ public class TranscriptUploaderGUI {
 		gbc_txtTranscriptCount.gridy = 2;
 		panel_1.add(txtTranscriptCount, gbc_txtTranscriptCount);
 		txtTranscriptCount.setColumns(10);
-
-		btnSelectFiles = new JButton("Select Files");
-		GridBagConstraints gbc_btnSelectFiles = new GridBagConstraints();
-		gbc_btnSelectFiles.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnSelectFiles.gridx = 2;
-		gbc_btnSelectFiles.gridy = 2;
-		panel_1.add(btnSelectFiles, gbc_btnSelectFiles);
 
 		JPanel panel_2 = new JPanel();
 		panel_2.setBorder(BorderFactory
@@ -303,16 +295,12 @@ public class TranscriptUploaderGUI {
 		panel_2.add(lblUploadSuccess, gbc_lblUploadSuccess);
 
 		btnLogin.addActionListener(new LoginListener());
-		btnSelectFolder.addActionListener(new FolderListener());
-		btnSelectFiles.addActionListener(new FilesListener());
 		btnCheckTranscripts.addActionListener(new CheckListener());
 		btnUploadTranscripts.addActionListener(new UploadListener());
 		txtUsername.addMouseListener(new TextListener());
 		pwdPassword.addMouseListener(new TextListener());
 
 		comboBox.setEnabled(false);
-		btnSelectFolder.setEnabled(false);
-		btnSelectFiles.setEnabled(false);
 		btnCheckTranscripts.setEnabled(false);
 		btnUploadTranscripts.setEnabled(false);
 	}
@@ -341,7 +329,6 @@ public class TranscriptUploaderGUI {
 				}
 
 				comboBox.setEnabled(true);
-				btnSelectFolder.setEnabled(true);
 				btnSelectFiles.setEnabled(true);
 
 			} catch (AuthenticationException e) {
@@ -365,6 +352,11 @@ public class TranscriptUploaderGUI {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			JFileChooser fileChooser = new JFileChooser();
+			FileNameExtensionFilter filter = new FileNameExtensionFilter(
+					".txt Transcripts .sbv Subtitles", "sbv", "txt");
+			fileChooser.setFileFilter(filter);
+			fileChooser.setCurrentDirectory(new File(System
+					.getProperty("user.dir")));
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			fileChooser.setMultiSelectionEnabled(true);
 
@@ -382,37 +374,6 @@ public class TranscriptUploaderGUI {
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	public class FolderListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			JFileChooser fileChooser = new JFileChooser();
-			fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			fileChooser.setMultiSelectionEnabled(false);
-
-			int returnVal = fileChooser.showOpenDialog(frame);
-
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				File folder = fileChooser.getSelectedFile();
-				if (folder.isDirectory()) {
-					try {
-						txtTranscriptCount.setText(String
-								.valueOf(transcriptUploader
-										.parseTranscripts(folder)));
-
-						btnCheckTranscripts.setEnabled(true);
-
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				} else {
-					System.out.println("Not a Directory");
 				}
 			}
 		}
