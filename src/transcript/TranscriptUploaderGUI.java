@@ -43,7 +43,7 @@ import com.google.gdata.util.ServiceException;
 
 public class TranscriptUploaderGUI {
 
-	private JFrame frmTranscriptUploader;
+	private JFrame frame;
 	private JTextField txtUsername;
 	private JPasswordField pwdPassword;
 	private JTextField txtFolderPath;
@@ -67,7 +67,7 @@ public class TranscriptUploaderGUI {
 			public void run() {
 				try {
 					TranscriptUploaderGUI window = new TranscriptUploaderGUI();
-					window.frmTranscriptUploader.setVisible(true);
+					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -88,19 +88,18 @@ public class TranscriptUploaderGUI {
 	 */
 	private void initialize() {
 
-		frmTranscriptUploader = new JFrame();
-		frmTranscriptUploader.setTitle("Transcript Uploader");
-		frmTranscriptUploader.setMinimumSize(new Dimension(640, 480));
-		frmTranscriptUploader.setBounds(100, 100, 450, 300);
-		frmTranscriptUploader.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame = new JFrame();
+		frame.setMinimumSize(new Dimension(640, 480));
+		frame.setBounds(100, 100, 450, 300);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0 };
 		gridBagLayout.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
 		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 1.0,
 				Double.MIN_VALUE };
-		frmTranscriptUploader.getContentPane().setLayout(gridBagLayout);
-		frmTranscriptUploader.setVisible(true);
+		frame.getContentPane().setLayout(gridBagLayout);
+		frame.setVisible(true);
 
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
@@ -109,7 +108,7 @@ public class TranscriptUploaderGUI {
 		gbc_panel.fill = GridBagConstraints.BOTH;
 		gbc_panel.gridx = 0;
 		gbc_panel.gridy = 0;
-		frmTranscriptUploader.getContentPane().add(panel, gbc_panel);
+		frame.getContentPane().add(panel, gbc_panel);
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[] { 62, 134, 59, 78, 0 };
 		gbl_panel.rowHeights = new int[] { 28, 0, 0 };
@@ -169,7 +168,7 @@ public class TranscriptUploaderGUI {
 		gbc_panel_1.fill = GridBagConstraints.BOTH;
 		gbc_panel_1.gridx = 0;
 		gbc_panel_1.gridy = 1;
-		frmTranscriptUploader.getContentPane().add(panel_1, gbc_panel_1);
+		frame.getContentPane().add(panel_1, gbc_panel_1);
 		GridBagLayout gbl_panel_1 = new GridBagLayout();
 		gbl_panel_1.columnWidths = new int[] { 0, 0, 0, 0 };
 		gbl_panel_1.rowHeights = new int[] { 0, 0, 0, 0 };
@@ -246,7 +245,7 @@ public class TranscriptUploaderGUI {
 		gbc_panel_2.fill = GridBagConstraints.BOTH;
 		gbc_panel_2.gridx = 0;
 		gbc_panel_2.gridy = 2;
-		frmTranscriptUploader.getContentPane().add(panel_2, gbc_panel_2);
+		frame.getContentPane().add(panel_2, gbc_panel_2);
 		GridBagLayout gbl_panel_2 = new GridBagLayout();
 		gbl_panel_2.columnWidths = new int[] { 0, 0, 0 };
 		gbl_panel_2.rowHeights = new int[] { 0, 0, 0, 0 };
@@ -361,7 +360,7 @@ public class TranscriptUploaderGUI {
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			fileChooser.setMultiSelectionEnabled(true);
 
-			int returnVal = fileChooser.showOpenDialog(frmTranscriptUploader);
+			int returnVal = fileChooser.showOpenDialog(frame);
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 
