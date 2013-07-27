@@ -44,7 +44,7 @@ bear
 behavioural economics
 benefit incidence
 beta
-bidffer spread
+bidoffer spread
 biflation
 big mac index
 black economy
@@ -141,7 +141,7 @@ consumer prices
 consumer surplus
 consumer unit economics
 consumption
-consumptionossibility frontier
+consumptionpossibility frontier
 contagion
 contestable market
 contingent employment economics
@@ -244,7 +244,7 @@ effective exchange rate
 effectiveness
 efficiency
 efficiency wages
-efficiencyhoroughness trade off principle
+efficiencythoroughness trade off principle
 efficient market hypothesis
 elasticity
 elevator economics
@@ -297,7 +297,7 @@ fdi
 federal budget economics
 federal reserve system
 fedspeak
-feianis model of economic growth
+feiranis model of economic growth
 final product
 financial centre
 financial instrument
@@ -327,7 +327,7 @@ free riding
 free trade
 frictional unemployment
 friedman  milton
-friedmanavage utility function
+friedmansavage utility function
 full employment
 fungibility
 fungible
@@ -397,7 +397,7 @@ in kind
 income
 income effect
 income tax
-incomeonsumption curve
+incomeconsumption curve
 incumbent advantage
 index economics
 index numbers
@@ -545,7 +545,7 @@ monopoly
 monopsony
 moral hazard
 moral suasion
-morrisutnam point
+morrisputnam point
 most favoured nation
 multiplier
 nafta
@@ -660,7 +660,7 @@ procyclical and countercyclical
 producer prices
 producer surplus
 production function
-productionossibility frontier
+productionpossibility frontier
 productivity
 profit
 profit economics
