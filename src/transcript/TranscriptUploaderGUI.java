@@ -58,6 +58,10 @@ public class TranscriptUploaderGUI {
 	private JButton btnSelectFiles;
 	private JTextField txtTranscriptCount;
 	private JLabel lblUploadSuccess;
+	private JComboBox comboBox_Language;
+
+	public static final String[] LANGUAGE_LIST = { "EN", "CN" };
+	private JLabel lblLanguage;
 
 	/**
 	 * Launch the application.
@@ -171,9 +175,9 @@ public class TranscriptUploaderGUI {
 		gbc_panel_1.gridy = 1;
 		frmTranscriptUploader.getContentPane().add(panel_1, gbc_panel_1);
 		GridBagLayout gbl_panel_1 = new GridBagLayout();
-		gbl_panel_1.columnWidths = new int[] { 0, 0, 0, 0 };
+		gbl_panel_1.columnWidths = new int[] { 0, 0, 0, 0, 0 };
 		gbl_panel_1.rowHeights = new int[] { 0, 0, 0, 0 };
-		gbl_panel_1.columnWeights = new double[] { 0.0, 1.0, 0.0,
+		gbl_panel_1.columnWeights = new double[] { 0.0, 1.0, 0.0, 0.0,
 				Double.MIN_VALUE };
 		gbl_panel_1.rowWeights = new double[] { 0.0, 1.0, 1.0, Double.MIN_VALUE };
 		panel_1.setLayout(gbl_panel_1);
@@ -189,12 +193,27 @@ public class TranscriptUploaderGUI {
 
 		comboBox = new JComboBox();
 		GridBagConstraints gbc_comboBox = new GridBagConstraints();
-		gbc_comboBox.gridwidth = 2;
-		gbc_comboBox.insets = new Insets(0, 0, 5, 0);
+		gbc_comboBox.insets = new Insets(0, 0, 5, 5);
 		gbc_comboBox.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboBox.gridx = 1;
 		gbc_comboBox.gridy = 0;
 		panel_1.add(comboBox, gbc_comboBox);
+		
+		lblLanguage = new JLabel("Language");
+		GridBagConstraints gbc_lblLanguage = new GridBagConstraints();
+		gbc_lblLanguage.insets = new Insets(0, 0, 5, 5);
+		gbc_lblLanguage.anchor = GridBagConstraints.EAST;
+		gbc_lblLanguage.gridx = 2;
+		gbc_lblLanguage.gridy = 0;
+		panel_1.add(lblLanguage, gbc_lblLanguage);
+
+		comboBox_Language = new JComboBox();
+		GridBagConstraints gbc_comboBox_Language = new GridBagConstraints();
+		gbc_comboBox_Language.insets = new Insets(0, 0, 5, 0);
+		gbc_comboBox_Language.fill = GridBagConstraints.HORIZONTAL;
+		gbc_comboBox_Language.gridx = 3;
+		gbc_comboBox_Language.gridy = 0;
+		panel_1.add(comboBox_Language, gbc_comboBox_Language);
 
 		JLabel lblTranscripts = new JLabel("Transcripts");
 		lblTranscripts.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -219,8 +238,8 @@ public class TranscriptUploaderGUI {
 
 		btnSelectFiles = new JButton("Select Files");
 		GridBagConstraints gbc_btnSelectFiles = new GridBagConstraints();
+		gbc_btnSelectFiles.gridwidth = 2;
 		gbc_btnSelectFiles.gridheight = 2;
-		gbc_btnSelectFiles.insets = new Insets(0, 0, 5, 0);
 		gbc_btnSelectFiles.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnSelectFiles.gridx = 2;
 		gbc_btnSelectFiles.gridy = 1;
@@ -304,6 +323,12 @@ public class TranscriptUploaderGUI {
 		comboBox.setEnabled(false);
 		btnCheckTranscripts.setEnabled(false);
 		btnUploadTranscripts.setEnabled(false);
+
+		for (String lang : LANGUAGE_LIST) {
+			comboBox_Language.addItem(lang);
+		}
+		comboBox_Language.setSelectedIndex(0);
+
 	}
 
 	public class LoginListener implements ActionListener {
@@ -491,8 +516,8 @@ public class TranscriptUploaderGUI {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-
-			UploadWorker uploadWorker = new UploadWorker();
+			UploadWorker uploadWorker = new UploadWorker(
+					LANGUAGE_LIST[comboBox_Language.getSelectedIndex()]);
 			uploadWorker.execute();
 			System.out.println("Working...");
 		}
@@ -500,10 +525,15 @@ public class TranscriptUploaderGUI {
 
 	public class UploadWorker extends SwingWorker<Boolean, Void> {
 
+		private String contentLanguage;
+
+		public UploadWorker(String contentLanguage) {
+			this.contentLanguage = contentLanguage;
+		}
+
 		@Override
 		protected Boolean doInBackground() throws Exception {
-
-			return transcriptUploader.uploadAll();
+			return transcriptUploader.uploadAll(contentLanguage);
 		}
 
 		protected void done() {

@@ -157,7 +157,7 @@ public class TranscriptUploader {
 		return videoIds;
 	}
 
-	public boolean uploadAll() throws MalformedURLException, IOException,
+	public boolean uploadAll(String contentLanguage) throws MalformedURLException, IOException,
 			ServiceException {
 
 		boolean allSuccess = false;
@@ -165,7 +165,7 @@ public class TranscriptUploader {
 		if (videoIds.size() == transcripts.size()) {
 			allSuccess = true;
 			for (int i = 0; i < videoIds.size(); i++) {
-				if (!uploadCaption(videoIds.get(i), transcripts.get(i))) {
+				if (!uploadCaption(videoIds.get(i), transcripts.get(i), contentLanguage)) {
 					allSuccess = false;
 				}
 
@@ -184,15 +184,16 @@ public class TranscriptUploader {
 		return allSuccess;
 	}
 
-	private boolean uploadCaption(String videoId, String captionTrack)
-			throws MalformedURLException, IOException, ServiceException {
+	private boolean uploadCaption(String videoId, String captionTrack,
+			String contentLanguage) throws MalformedURLException, IOException,
+			ServiceException {
 
 		String captionsUrl = String.format(CAPTION_FEED_URL_FORMAT, videoId);
 
 		GDataRequest request = service
 				.createInsertRequest(new URL(captionsUrl));
 
-		request.setHeader("Content-Language", "EN");
+		request.setHeader("Content-Language", contentLanguage);
 		request.setHeader("Content-Type",
 				"application/vnd.youtube.timedtext; charset=UTF-8");
 		request.getRequestStream().write(captionTrack.getBytes("UTF-8"));
