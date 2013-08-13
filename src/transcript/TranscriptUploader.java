@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,13 +35,21 @@ public class TranscriptUploader {
 	private ArrayList<File> txts;
 
 	public static final String CAPTION_FEED_URL_FORMAT = "http://gdata.youtube.com/feeds/api/videos/%s/captions";
-	public static final String DEVELOPER_KEY = "AI39si5Sfx7cQ-LXq6ERi31r5K19y1x5w94Cnirtp1Vza30kDELcLFCr6LjoYDfplqlpRia19SBYn8ZUffQMXtwGbjuc2ezq0w";
-	public static final String CLIENT_ID = "ol-youtube";
 	public static final String CAPTION_FAILURE_TAG = "Caption Upload Failed";
 	public static final String PLAYLIST_FEED_URL_FORMAT = "http://gdata.youtube.com/feeds/api/users/%s/playlists";
 
 	public TranscriptUploader(String username, String password)
 			throws MalformedURLException, IOException, ServiceException {
+
+		Properties properties = new Properties();
+		try {
+			properties.loadFromXML(new FileInputStream("properties.xml"));
+		} catch (FileNotFoundException e) {
+			System.out.println("No properties file found.");
+		}
+
+		String DEVELOPER_KEY = properties.getProperty("DEVELOPER_KEY");
+		String CLIENT_ID = properties.getProperty("CLIENT_ID");
 
 		transcripts = new ArrayList<String>();
 		videoIds = new ArrayList<String>();
@@ -157,15 +166,16 @@ public class TranscriptUploader {
 		return videoIds;
 	}
 
-	public boolean uploadAll(String contentLanguage) throws MalformedURLException, IOException,
-			ServiceException {
+	public boolean uploadAll(String contentLanguage)
+			throws MalformedURLException, IOException, ServiceException {
 
 		boolean allSuccess = false;
 
 		if (videoIds.size() == transcripts.size()) {
 			allSuccess = true;
 			for (int i = 0; i < videoIds.size(); i++) {
-				if (!uploadCaption(videoIds.get(i), transcripts.get(i), contentLanguage)) {
+				if (!uploadCaption(videoIds.get(i), transcripts.get(i),
+						contentLanguage)) {
 					allSuccess = false;
 				}
 
